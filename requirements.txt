@@ -1,0 +1,12 @@
+streamlit-drawable-canvas>=0.8
+svgpathtools
+svgwrite
+sympy==1.11.1
+matplotlib==3.7.0
+plotly==5.14.1
+st-pages==0.4.1
+streamlit-extras==0.2.7
+streamlit-code-editor==0.1.8
+pytesseract==0.3.10
+streamlit-server-state==0.16.0
+

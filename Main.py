@@ -33,12 +33,13 @@ st.write(vals)
 col1,col2 = st.columns(2)
 
 with col1:
-    x_rango1 = st.number_input(r'Ingrese el valor minimo de $x$',min_value=-10,max_value=10,value=-3)
-    x_rango2 = st.number_input(r'Ingrese el valor maximo de $x$',min_value=-10,max_value=10,value=3)
+    x_rango1 = st.number_input(r'Ingrese el valor minimo de $x$',min_value=-100,max_value=100,value=-10)
+    x_rango2 = st.number_input(r'Ingrese el valor maximo de $x$',min_value=-100,max_value=100,value=10)
 
 with col2:
-    y_rango1 = st.number_input(r'Ingrese el valor minimo de $y$',min_value=-10,max_value=10,value=-3)
-    y_rango2 = st.number_input(r'Ingrese el valor maximo de $y$',min_value=-10,max_value=10,value=3)
+    y_rango1 = st.number_input(r'Ingrese el valor minimo de $y$',min_value=-100,max_value=100,value=-10)
+    y_rango2 = st.number_input(r'Ingrese el valor maximo de $y$',min_value=-100,max_value=100,value=10)
+
 
 
 x_vals = np.linspace(x_rango1, x_rango2, 100)
@@ -47,6 +48,14 @@ xx, yy = np.meshgrid(x_vals, y_vals)
 zz = ft(xx,yy)
 
 c = 1
+
+f = sp.symbols('f', cls=sp.Function)
+eq = st.text_input(r'Ingrese la ecuación diferencial','Derivative(f(x), x) - x*f(x)')
+diff_eq_str = sp.parse_expr(eq)
+
+sol = sp.dsolve(diff_eq_str)
+st.latex(sp.latex(diff_eq_str))
+st.latex(sp.latex(sol))
 
 
 fig = go.Figure()
@@ -88,11 +97,31 @@ fig.update_layout(
 )
 
 
-st.plotly_chart(fig)
-f = sp.symbols('f', cls=sp.Function)
-eq = st.text_input(r'Ingrese la ecuación diferencial','Derivative(f(x), x) + 2*f(x)')
-diff_eq_str = sp.parse_expr(eq)
 
-st.latex(sp.latex(diff_eq_str))
-st.latex(sp.latex(sp.dsolve(diff_eq_str).free_symbols))
-st.write(diff_eq_str.free_symbols)
+st.plotly_chart(fig)
+
+fig2 = go.Figure()
+
+for t in vals:
+    try:
+        fsol =sol.args[-1].subs({list(sol.free_symbols)[1]: t})
+        flamb = sp.lambdify(x,fsol)
+        st.write(flamb(10))
+        #st.write(sol.subs({list(sol.free_symbols)[1]: t}))
+        #lt = [t for i in range(len(x_vals))]
+        fig2.add_trace(go.Scatter(x=x_vals, y=flamb(x_vals), mode='lines',line=dict(color='black'),name='Solución'))
+    except:
+        continue
+
+fig2.add_vline(x=0, line_width=1)
+fig2.add_hline(y=0, line_width=1)
+
+fig2.update_layout(
+    xaxis_title='X',
+    yaxis_title='Y',
+)
+
+st.plotly_chart(fig2)
+
+
+
